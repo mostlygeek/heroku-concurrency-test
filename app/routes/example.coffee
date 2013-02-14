@@ -6,3 +6,6 @@ module.exports = (app) ->
     # with app, we declare our routes and the handlers
     app.get '/', (req, res) ->
         res.render 'example'
+
+    app.get '/slow-response', (req, res) ->
+        setTimeout (-> res.send "OK"), 500

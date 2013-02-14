@@ -1,14 +1,69 @@
 doctype 5
 html
     head
-        title Example Page
-        link(href="/css/test.css",rel="stylesheet")
-        script(src="/js/test.js")
+        title Test Heroku Concurrency
+        script(src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js")
+        :stylus
+            #ugh-too-wide
+                width 30em
     body
-        :markdown
-            # It's Awesome
+        #ugh-too-wide
+            :markdown
+                # About
 
-        :coffeescript
-            document.write "In Jade CoffeeScript works"
-            # from test.coffee, transpiled dynamically to /js/test.js
-            loaded "... so does included coffeescript"
+                RapGenius wrote this [blog post](http://rapgenius.com/James-somers-herokus-ugly-secret-lyrics) 
+                about how Heroku's routing mesh only allows one concurrent request / dyno. Regardless if the dyno can 
+                handle more than 1 concurrent request at a time. 
+
+                It sounds plusible but let's test it for ourselves. 
+
+                ## About The Test
+
+                The button below will fire 15 concurrent HTTP requests to the server. The server (node.js) will 
+                wait 500ms before returning an "OK". 
+
+                Depending on the browser you are using you will see all requests appear in an `in-flight` status.
+                Then they will come back in batches of 5 or 6. This is normal behaviour as modern browsers will
+                fetch things concurrently. 
+
+                To get around caching, a little cache buster is appended to the URLs.
+
+                The round trip times are rounded to the nearest 100ms to make it easier to see groups 
+                of concurrent request. 
+
+
+            button#startTest START TEST
+
+            h2 Results
+            ol#results
+
+            :coffeescript
+                $results = $('#results')
+
+                concurrency = 14
+
+                done = -1
+
+                $('#startTest').on 'click', ->
+                    return unless done == -1
+
+                    $results.empty()
+                    done = 0 # poor man's fan-in
+
+                    for i in [0..concurrency]
+                        do (i) ->
+                            $item = $("""<li>in-flight</li>""")
+                            $results.append $item
+                            cacheBust = "#{Date.now()}-#{i}"
+                            jqXHR = $.get("/slow-response?#{cacheBust}")
+                            start = Date.now()
+                            jqXHR.done ->
+                                end = Math.round((Date.now() - start)/100) * 100
+                                $item.text("Finished. Took: #{end}ms")
+                                done = done + 1
+                                if done == concurrency + 1
+                                    done = -1
+
+                    null
+
+
