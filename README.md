@@ -9,6 +9,7 @@ architectures like Ruby on Rails, PHP, Django, etc. Evented architectures are si
 so they don't suffer from the same concurrency problems.
 
 [Source code on GitHub](https://github.com/mostlygeek/heroku-concurrency-test)
+[Try it on Heroku](http://test-concurrency.herokuapp.com/)
 
 ## About The Test
 
