@@ -8,8 +8,8 @@ Edit: After reading the blog post more carefully, it really only affects one pro
 architectures like Ruby on Rails, PHP, Django, etc. Evented architectures are singled threaded
 so they don't suffer from the same concurrency problems.
 
-[Source code on GitHub](https://github.com/mostlygeek/heroku-concurrency-test)
-[Try it on Heroku](http://test-concurrency.herokuapp.com/)
+* [Source code on GitHub](https://github.com/mostlygeek/heroku-concurrency-test)
+* [Try it on Heroku](http://test-concurrency.herokuapp.com/)
 
 ## About The Test
 
