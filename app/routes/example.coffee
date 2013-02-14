@@ -8,4 +8,4 @@ module.exports = (app) ->
         res.render 'example'
 
     app.get '/slow-response', (req, res) ->
-        setTimeout (-> res.send "OK"), 500
+        setTimeout (-> res.send "OK"), 2000
