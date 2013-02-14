@@ -1,56 +1,33 @@
-coffee-express 
-==============
+# About
 
-(Yet another Express+CoffeeScript template)
+RapGenius wrote this [blog post](http://rapgenius.com/James-somers-herokus-ugly-secret-lyrics) 
+about how Heroku's routing mesh only allows one concurrent request / dyno. Regardless if the dyno can 
+handle more than 1 concurrent request at a time. 
 
-This is how I like to lay out my Express + CoffeeScript projects. It uses CoffeeScript 
-instead of JavaScript and it has bits to make the coffeescript compiling as transparent 
-and frictionless as possible. 
+Edit: After reading the blog post more carefully, it really only affects one process/request based
+architectures like Ruby on Rails, PHP, Django, etc. Evented architectures are singled threaded
+so they don't suffer from the same concurrency problems.
 
-For backend development, instead of `node server.js` we can run `coffee server.coffee`. 
-All the node.js bits inside still work the same but we do not need to compile the 
-coffeescript first. 
+[Source code on GitHub](https://github.com/mostlygeek/heroku-concurrency-test)
 
-For frontend development, the express middleware, [connect-coffee-script](https://github.com/wdavidw/node-connect-coffee-script) that compile and cache CoffeeScript just in time. The same goes for the stylus css generator. Just write your code in CoffeeScript or Stylus and ask for them as .js or .css files. 
+## About The Test
 
-Dependencies
-============
+The button below will fire 15 concurrent HTTP requests to the server. The server (node.js) will 
+wait 2000ms before returning an "OK". 
 
-* [CoffeeScript](http://coffeescript.org) for client side and server development
-* [connect-coffee-script](ttps://github.com/wdavidw/node-connect-coffee-script)
-* [Mocha](http://visionmedia.github.com/mocha/) testing framework with should.js 
-* [Jade](http://jade-lang.com/) templates for HTML generation
-* [Stylus](http://learnboost.github.com/stylus/) for CSS generation
-* [Docco](http://jashkenas.github.com/docco/) for documentation generation
+Depending on the browser you are using you will see all requests appear in an `in-flight` status.
+Then they will come back in batches of 5 or 6. This is normal behaviour as modern browsers will
+fetch things concurrently. 
 
-Application Layout
-==================
+To get around caching, a little cache buster is appended to the URLs.
 
-    app/                    <- the application
-        lib/                <- put misc. libraries in here 
-        routes/             <- organize express routes in here
-        views/              <- jade templates ...
-        public/             <- public files (or ment to be public)
-            src/            <- coffeescript/stylus source files
-            generated/      <- generated coffeescript files ...
-            static/         <- static, public files (.png, .js, .css, etc.)
-        index.coffee        <- main entry point into the Application
-    docs/                   <- generated documentation
-    test/                   <- tests go in here
-    server.coffee           <- starts the web server(s)
-    Cakefile                <- App. specific tasks
-    package.json            <- mmm. npm package definitions
+The round trip times are rounded to the nearest 200ms to make it easier to see groups 
+of concurrent request. 
 
-USING
-=====
+## Interpreting the Results
 
-1. Git clone the repo
-1. Delete the .git directory
-1. `npm install`
-1. `git init` 
-1. push it to your own repo
+If results come back sequentially at times of 2000ms, 4000ms, 6000ms, etc. then 
+the routing mesh only allows 1/req per dyno. 
 
-LICENSE
-=======
-
-MIT
+If you see groups of requests come back at the same time then each dyno can 
+handle multiple concurrent requests.    
